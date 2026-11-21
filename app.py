@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from bson import ObjectId
 from bson.errors import InvalidId
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 from pymongo import MongoClient, ReturnDocument
 
 app = Flask(__name__)
@@ -74,6 +74,7 @@ def validate(data, partial=False):
     return clean, errors
 
 
+
 @app.get("/api/health")
 def health():
     try:
@@ -82,6 +83,9 @@ def health():
     except Exception:
         return jsonify(status="error", mongo="unreachable"), 503
 
+@app.get("/")
+def index():
+    return render_template("index.html")
 
 @app.post("/api/items")
 def create_item():
