@@ -126,6 +126,7 @@ async function loadItems() {
   const list = $("item-list");
   const status = $("status");
   status.textContent = "Loading...";
+
   const params = new URLSearchParams();
   if ($("search").value.trim()) params.set("q", $("search").value.trim());
   if ($("filter-type").value) params.set("type", $("filter-type").value);
@@ -135,6 +136,7 @@ async function loadItems() {
     status.textContent = items.length
       ? items.length + (items.length === 1 ? " item" : " items")
       : "Nothing here yet. Add your first rating!";
+      loadStats();
   } catch (err) {
     list.replaceChildren();
     status.textContent = "Couldn't load items: " + err.message;
@@ -196,6 +198,77 @@ $("filter-type").addEventListener("change", loadItems);
 $("search").addEventListener("input", () => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(loadItems, 250);
+});
+
+const pform = $("predict-form");
+
+async function loadStats() {
+  try {
+    const s = await api("/api/model/stats");
+    $("lock-box").hidden = s.unlocked;
+    pform.hidden = !s.unlocked;
+    if (!s.unlocked) {
+      const total = s.count + s.needed;
+      $("lock-text").textContent =
+        `${s.needed} more ${s.needed === 1 ? "rating" : "ratings"} until predictions unlock (${s.count}/${total})`;
+      $("progress-bar").style.width = (s.count / total) * 100 + "%";
+      $("prediction").replaceChildren();
+    }
+  } catch (err) {
+    $("lock-text").textContent = "Couldn't load model status.";
+  }
+}
+
+function renderPrediction(r) {
+  const box = $("prediction");
+  box.replaceChildren();
+  const rounded = Math.round(r.predicted);
+  box.appendChild(el("div", "pred-number", r.predicted.toFixed(1) + " / 5"));
+  box.appendChild(el("div", "stars", "★".repeat(rounded) + "☆".repeat(5 - rounded)));
+  box.appendChild(el("div", "meta", `Confidence: ${r.confidence} · based on ${r.based_on} ratings`));
+  const ul = el("ul", "reasons");
+  r.reasons.forEach((text) => ul.appendChild(el("li", "", text)));
+  box.appendChild(ul);
+}
+
+pform.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  pform.querySelectorAll(".error").forEach((s) => (s.textContent = ""));
+  const num = (id) => ($(id).value === "" ? null : Number($(id).value));
+  const data = {
+    title: $("ptitle").value.trim(),
+    type: $("ptype").value,
+    genre: $("pgenre").value.trim(),
+    creator: $("pcreator").value.trim(),
+    year: num("pyear"),
+    length: num("plength"),
+  };
+  let bad = false;
+  if (!data.title) { $("perr-title").textContent = "Title is required"; bad = true; }
+  if (!data.genre) { $("perr-genre").textContent = "Genre is required"; bad = true; }
+  if (bad) return;
+  if (data.year === null) delete data.year;
+  if (data.length === null) delete data.length;
+
+  const btn = $("predict-btn");
+  btn.disabled = true;
+  btn.textContent = "Predicting...";
+  try {
+    const result = await api("/api/predict", { method: "POST", body: JSON.stringify(data) });
+    if (result.locked) loadStats();
+    else renderPrediction(result);
+  } catch (err) {
+    if (err.fields) {
+      for (const [f, msg] of Object.entries(err.fields)) {
+        const span = $("perr-" + f);
+        if (span) span.textContent = msg;
+      }
+    }
+    toast(err.message === "Something went wrong" ? "Please fix the highlighted fields" : err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Predict my rating";
+  }
 });
 
 loadItems();

@@ -6,6 +6,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from flask import Flask, jsonify, render_template, request
 from pymongo import MongoClient, ReturnDocument
+from model import MIN_RATINGS, predict_rating
 
 app = Flask(__name__)
 client = MongoClient(
@@ -147,3 +148,28 @@ def delete_item(item_id):
     if not result or result.deleted_count == 0:
         return jsonify(error="item not found"), 404
     return "", 204
+
+@app.post("/api/predict")
+def predict_endpoint():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify(errors={"body": "send a JSON object"}), 400
+    clean, errors = validate({**data, "rating": 3})
+    if errors:
+        return jsonify(errors=errors), 400
+    clean.pop("rating")
+    docs = list(items.find({}, {"_id": 0, "type": 1, "genre": 1, "creator": 1,
+                                "year": 1, "length": 1, "rating": 1}))
+    return jsonify(predict_rating(docs, clean))
+
+
+@app.get("/api/model/stats")
+def model_stats():
+    ratings = [d["rating"] for d in items.find({}, {"rating": 1})]
+    n = len(ratings)
+    return jsonify(
+        count=n,
+        needed=max(0, MIN_RATINGS - n),
+        unlocked=n >= MIN_RATINGS,
+        average=round(sum(ratings) / n, 2) if n else None,
+    )

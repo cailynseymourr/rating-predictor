@@ -13,56 +13,100 @@
   </header>
 
   <main>
-    <section class="card" id="form-card">
-      <h2 id="form-title">Add an item</h2>
-      <form id="item-form" novalidate>
-        <label>Title *
-          <input id="title" maxlength="200">
-          <span class="error" id="err-title"></span>
-        </label>
+    <div class="col">
+      <section class="card" id="form-card">
+        <h2 id="form-title">Add an item</h2>
+        <form id="item-form" novalidate>
+          <label>Title *
+            <input id="title" maxlength="200">
+            <span class="error" id="err-title"></span>
+          </label>
 
-        <div class="row">
-          <label>Type *
-            <select id="type">
-              <option value="book">Book</option>
-              <option value="show">Show</option>
-            </select>
+          <div class="row">
+            <label>Type *
+              <select id="type">
+                <option value="book">Book</option>
+                <option value="show">Show</option>
+              </select>
+            </label>
+            <label>Genre *
+              <input id="genre" maxlength="50" placeholder="e.g. sci-fi">
+              <span class="error" id="err-genre"></span>
+            </label>
+          </div>
+
+          <label>Creator (author or studio)
+            <input id="creator" maxlength="100">
           </label>
-          <label>Genre *
-            <input id="genre" maxlength="50" placeholder="e.g. sci-fi">
-            <span class="error" id="err-genre"></span>
+
+          <div class="row">
+            <label>Year
+              <input id="year" type="number" placeholder="e.g. 1965">
+              <span class="error" id="err-year"></span>
+            </label>
+            <label>Length
+              <input id="length" type="number" placeholder="pages / episodes">
+              <span class="error" id="err-length"></span>
+            </label>
+            <label>Rating (1-5) *
+              <input id="rating" type="number" min="1" max="5">
+              <span class="error" id="err-rating"></span>
+            </label>
+          </div>
+
+          <label>Notes
+            <textarea id="notes" rows="2" maxlength="1000"></textarea>
           </label>
+
+          <div class="actions">
+            <button type="submit" id="submit-btn">Add item</button>
+            <button type="button" id="cancel-btn" class="secondary" hidden>Cancel edit</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card" id="predict-card">
+        <h2>Predict a rating</h2>
+        <div id="lock-box">
+          <p id="lock-text" class="muted"></p>
+          <div class="progress"><div id="progress-bar"></div></div>
         </div>
 
-        <label>Creator (author or studio)
-          <input id="creator" maxlength="100">
-        </label>
-
-        <div class="row">
-          <label>Year
-            <input id="year" type="number" placeholder="e.g. 1965">
-            <span class="error" id="err-year"></span>
+        <form id="predict-form" novalidate hidden>
+          <label>Title *
+            <input id="ptitle" maxlength="200">
+            <span class="error" id="perr-title"></span>
           </label>
-          <label>Length 
-            <input id="length" type="number" placeholder="pages / episodes">
-            <span class="error" id="err-length"></span>
+          <div class="row">
+            <label>Type *
+              <select id="ptype">
+                <option value="book">Book</option>
+                <option value="show">Show</option>
+              </select>
+            </label>
+            <label>Genre *
+              <input id="pgenre" maxlength="50" placeholder="e.g. sci-fi">
+              <span class="error" id="perr-genre"></span>
+            </label>
+          </div>
+          <label>Creator
+            <input id="pcreator" maxlength="100">
           </label>
-          <label>Rating (1-5) *
-            <input id="rating" type="number" min="1" max="5">
-            <span class="error" id="err-rating"></span>
-          </label>
-        </div>
-
-        <label>Notes
-          <textarea id="notes" rows="2" maxlength="1000"></textarea>
-        </label>
-
-        <div class="actions">
-          <button type="submit" id="submit-btn">Add item</button>
-          <button type="button" id="cancel-btn" class="secondary" hidden>Cancel edit</button>
-        </div>
-      </form>
-    </section>
+          <div class="row">
+            <label>Year
+              <input id="pyear" type="number">
+              <span class="error" id="perr-year"></span>
+            </label>
+            <label>Length
+              <input id="plength" type="number" placeholder="pages / episodes">
+              <span class="error" id="perr-length"></span>
+            </label>
+          </div>
+          <button type="submit" id="predict-btn">Predict my rating</button>
+        </form>
+        <div id="prediction"></div>
+      </section>
+    </div>
 
     <section class="card">
       <h2>Your ratings</h2>

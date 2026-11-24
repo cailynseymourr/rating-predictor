@@ -77,3 +77,10 @@ li.item h3 { margin: 0 0 2px; font-size: 16px; }
 }
 #toast.show { opacity: 1; }
 #toast.error { background: #c0392b; }
+.col { display: flex; flex-direction: column; gap: 16px; }
+.progress { background: #e3e5e8; border-radius: 6px; height: 10px; overflow: hidden; }
+#progress-bar { background: #2f6fed; height: 100%; width: 0; transition: width 0.3s; }
+#prediction { margin-top: 14px; }
+.pred-number { font-size: 32px; font-weight: 700; }
+.reasons { margin-top: 8px; font-size: 14px; }
+.reasons li { padding: 2px 0; }
