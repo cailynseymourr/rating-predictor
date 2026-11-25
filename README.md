@@ -1,7 +1,7 @@
 # Rating Predictor
 
 GitHub: https://github.com/cailynseymourr/rating-predictor
-Canvas video: TODO (add the link tomorrow)
+Canvas video: https://canvas.uoregon.edu/courses/291089/assignments/2121608/submissions/186448?download=25980555
 
 A web app where you log the books and shows you've rated, and it predicts how much you'd like something new, with a short explanation of why.
 
